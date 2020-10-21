@@ -1,0 +1,3 @@
+include ':TonyWidgets'
+include ':app'
+rootProject.name = "TonyCameraUtil"
