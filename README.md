@@ -3,6 +3,11 @@
 This is a simple record button you can customize for android application.
 
 
+
+![](demo.gif)
+
+
+
 # Import
 #### 1.Add this in your project `build.gradle`:
     allprojects {
