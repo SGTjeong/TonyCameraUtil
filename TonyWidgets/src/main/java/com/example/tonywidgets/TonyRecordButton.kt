@@ -16,17 +16,7 @@ import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
 import java.lang.Exception
 
 class TonyRecordButton : View {
-    interface ActionListener {
-        fun onHandsFreeReady(isReady : Boolean){}
-
-        fun onHandsFree(){}
-
-        fun onStartRecord(){}
-
-        fun onFinishRecord(){}
-
-        fun onCapture()
-    }
+    private val TAG = this.javaClass.simpleName
 
     constructor(context: Context?) : super(context)
 
@@ -51,33 +41,25 @@ class TonyRecordButton : View {
         defStyleRes: Int
     ) : super(context, attrs, defStyleAttr, defStyleRes)
 
-    companion object{
-        val DEFAULT_SIZE = 300f
-        val DEFAULT_STROKE_WIDTH = 25f
-        val DEFAULT_DURATION = 30000L
-    }
-
     private var listener : ActionListener?= null
 
-    private var currentSize = 300f
-    private var outerSize = 300f
-    private var expandSize = 350f
-    private var containerSize = 400f
-    private var rectSize = 200f
+    private var currentSize = DEFAULT_SIZE
+    private var outerSize = DEFAULT_SIZE
+    private var expandSize = DEFAULT_SIZE * 1.25f
+    private var containerSize = DEFAULT_SIZE * 1.5f
+    private var rectSize = DEFAULT_SIZE / 3
     private var rectCurrentSize = 0f
 
     private var strokeWidth = DEFAULT_STROKE_WIDTH
-    private var strokeColor : Int = Color.WHITE
-    private var buttonColor : Int = Color.WHITE
-    private var recordColor : Int = Color.RED
-    private var strokeAlpha : Int = 255
+    private var strokeColor : Int = DEFAULT_COLOR
+    private var buttonColor : Int = DEFAULT_COLOR
+    private var recordColor : Int = DEFAULT_RECORD_COLOR
+    private var strokeAlpha : Int = DEFAULT_STROKE_ALPHA
 
-    private var startRecordTime = System.currentTimeMillis()
     private var duration = DEFAULT_DURATION
-    private var outerBorderRect = RectF()
-    private var innerRect = RectF()
     private var isRecording = false
     private var recordEnabled = true
+    private var startRecordTime = System.currentTimeMillis()
 
     private lateinit var recordAngleValueAnimator : ValueAnimator
     private lateinit var buttonScaleValueAnimator : ValueAnimator
@@ -90,14 +72,14 @@ class TonyRecordButton : View {
     }
 
     private fun loadAttributes(context: Context, attrs: AttributeSet) {
-        val attrArr = context.obtainStyledAttributes(attrs, R.styleable.tony_camera_button, 0, 0)
+        val attrArr = context.obtainStyledAttributes(attrs, R.styleable.tony_record_button, 0, 0)
         try{
-            duration = attrArr.getInteger(R.styleable.tony_camera_button_maxDuration, DEFAULT_DURATION.toInt()).toLong()
-            strokeWidth = attrArr.getDimensionPixelSize(R.styleable.tony_camera_button_strokeWidth, 100).toFloat()
-            buttonColor = attrArr.getColor(R.styleable.tony_camera_button_buttonColor, Color.WHITE)
-            strokeColor = attrArr.getColor(R.styleable.tony_camera_button_strokeColor, Color.WHITE)
-            recordColor = attrArr.getColor(R.styleable.tony_camera_button_recordColor, Color.RED)
-            strokeAlpha = attrArr.getInteger(R.styleable.tony_camera_button_strokeAlpha, 255)
+            duration = attrArr.getInteger(R.styleable.tony_record_button_maxDuration, DEFAULT_DURATION.toInt()).toLong()
+            strokeWidth = attrArr.getDimensionPixelSize(R.styleable.tony_record_button_strokeWidth, DEFAULT_STROKE_WIDTH.toInt()).toFloat()
+            buttonColor = attrArr.getColor(R.styleable.tony_record_button_buttonColor, DEFAULT_COLOR)
+            strokeColor = attrArr.getColor(R.styleable.tony_record_button_strokeColor, DEFAULT_COLOR)
+            recordColor = attrArr.getColor(R.styleable.tony_record_button_recordColor, DEFAULT_RECORD_COLOR)
+            strokeAlpha = attrArr.getInteger(R.styleable.tony_record_button_strokeAlpha, DEFAULT_STROKE_ALPHA)
             invalidate()
         } catch (e : Exception){
             Log.e("TonyPhonePicker", e.toString())
@@ -132,7 +114,6 @@ class TonyRecordButton : View {
             }
         }
 
-
         rectScaleValueAnimator = ValueAnimator.ofFloat().apply {
             interpolator = LinearOutSlowInInterpolator()
             duration = 300L
@@ -145,89 +126,89 @@ class TonyRecordButton : View {
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-        val minSide = Math.min(w,h)
 
+        val minSide = Math.min(w,h)
         containerSize = minSide.toFloat()
         outerSize = containerSize / 1.5f
         expandSize = outerSize * 1.25f
         currentSize = outerSize
         rectSize = outerSize / 3
-
-        outerBorderRect.set(
-            (containerSize - expandSize)/2,
-            (containerSize - expandSize)/2,
-            (containerSize + expandSize)/2,
-            (containerSize + expandSize)/2
-        )
-
-        innerRect.set(
-            (containerSize - rectSize)/2,
-            (containerSize - rectSize)/2,
-            (containerSize + rectSize)/2,
-            (containerSize + rectSize)/2
-        )
     }
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
-        canvas?.let{
-            val whitePaint = Paint()
-            whitePaint.color = strokeColor
-            whitePaint.alpha = strokeAlpha
-            whitePaint.style = Paint.Style.STROKE
-            whitePaint.strokeWidth = strokeWidth
-            whitePaint.isAntiAlias = true
+        canvas?:return
 
-            val grayPaint = Paint()
-            grayPaint.color = buttonColor
-            grayPaint.style = Paint.Style.FILL
-            grayPaint.isAntiAlias = true
-
-            Log.e("WONSIK", "draw : $strokeWidth")
-            it.drawCircle(containerSize/2, containerSize/2, currentSize/2, whitePaint)
-            it.drawCircle(containerSize/2, containerSize/2, (currentSize-strokeWidth)/2, grayPaint )
-
-            val redPaint = Paint()
-            redPaint.color = recordColor
-            redPaint.style = Paint.Style.STROKE
-            redPaint.strokeWidth = strokeWidth
-            redPaint.strokeCap = Paint.Cap.ROUND
-            redPaint.strokeJoin = Paint.Join.ROUND
-            redPaint.isAntiAlias = true
-
-            val redFillPaint = Paint()
-            redFillPaint.color = recordColor
-            redFillPaint.isAntiAlias = true
-
-            it.drawRoundRect(
-                (containerSize - rectCurrentSize)/2,
-                (containerSize - rectCurrentSize)/2,
-                (containerSize + rectCurrentSize)/2,
-                (containerSize + rectCurrentSize)/2,
-                10f,
-                10f,
-                redFillPaint
-            )
-
-            if(isRecording) {
-                outerBorderRect.set(
-                    (containerSize - currentSize)/2,
-                    (containerSize - currentSize)/2,
-                    (containerSize + currentSize)/2,
-                    (containerSize + currentSize)/2
-                )
-                canvas.drawArc(outerBorderRect, -90f, calculateCurrentAngle(), false, redPaint)
-            }
+        drawStroke(canvas)
+        drawInnerCircle(canvas)
+        if(isRecording) {
+            drawRecordStroke(canvas)
+            drawRecordRect(canvas)
         }
+    }
+
+    private fun drawInnerCircle(canvas: Canvas) {
+        val centerPaint = Paint().apply {
+            color = buttonColor
+            style = Paint.Style.FILL
+            isAntiAlias = true
+        }
+        canvas.drawCircle(containerSize/2, containerSize/2, (currentSize-strokeWidth)/2, centerPaint )
+    }
+
+    private fun drawStroke(canvas: Canvas) {
+        val strokePaint = Paint().apply {
+            color = strokeColor
+            alpha = strokeAlpha
+            style = Paint.Style.STROKE
+            strokeWidth = this@TonyRecordButton.strokeWidth
+            isAntiAlias = true
+        }
+        canvas.drawCircle(containerSize/2, containerSize/2, currentSize/2, strokePaint)
+    }
+
+    private fun drawRecordStroke(canvas: Canvas) {
+        val strokeRecordPaint = Paint().apply {
+            color = recordColor
+            style = Paint.Style.STROKE
+            strokeWidth = this@TonyRecordButton.strokeWidth
+            strokeCap = Paint.Cap.ROUND
+            strokeJoin = Paint.Join.ROUND
+            isAntiAlias = true
+        }
+        val outerBorderRect = RectF().apply {
+            set(
+                (containerSize - currentSize)/2,
+                (containerSize - currentSize)/2,
+                (containerSize + currentSize)/2,
+                (containerSize + currentSize)/2
+            )
+        }
+        canvas.drawArc(outerBorderRect, -90f, calculateCurrentAngle(), false, strokeRecordPaint)
+    }
+
+    private fun drawRecordRect(canvas: Canvas) {
+        val recordPaint = Paint()?.apply {
+            color = recordColor
+            isAntiAlias = true
+        }
+        canvas.drawRoundRect(
+            (containerSize - rectCurrentSize)/2,
+            (containerSize - rectCurrentSize)/2,
+            (containerSize + rectCurrentSize)/2,
+            (containerSize + rectCurrentSize)/2,
+            10f,
+            10f,
+            recordPaint
+        )
+    }
+
+    fun setRecordEnabled(isEnabled: Boolean){
+        recordEnabled = isEnabled
     }
 
     private fun onCapture() {
         listener?.onCapture()
-    }
-
-    private fun calculateCurrentAngle() : Float {
-        val millisPassed = System.currentTimeMillis() - startRecordTime
-        return millisPassed * 360f / duration
     }
 
     private fun onLongPressTrigger() {
@@ -242,7 +223,6 @@ class TonyRecordButton : View {
         listener?.onStartRecord()
     }
 
-
     private fun onRecordEnd() {
         isRecording = false
         isHandsFree = false
@@ -255,11 +235,17 @@ class TonyRecordButton : View {
         listener?.onFinishRecord()
     }
 
+    private fun calculateCurrentAngle() : Float {
+        val millisPassed = System.currentTimeMillis() - startRecordTime
+        return millisPassed * 360f / duration
+    }
+
     private var isReadyForHandsFree = false
     private var isHandsFree = false
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         gestureDetector?.onTouchEvent(event)
+
         if(!isRecording && event?.action == MotionEvent.ACTION_UP){
             buttonScaleValueAnimator?.cancel()
             buttonScaleValueAnimator?.setFloatValues(currentSize, outerSize)
@@ -304,18 +290,9 @@ class TonyRecordButton : View {
                     listener?.onHandsFreeReady(false)
                 }
             }
-
         }
 
         return true
-    }
-
-    fun setRecordEnabled(isEnabled: Boolean){
-        recordEnabled = isEnabled
-    }
-
-    fun setActionListener(listener : ActionListener){
-        this.listener = listener
     }
 
     private val gestureDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener(){
@@ -331,7 +308,7 @@ class TonyRecordButton : View {
                 onCapture()
             }
 
-            return super.onSingleTapUp(e)
+            return true
         }
 
         override fun onLongPress(e: MotionEvent?) {
@@ -340,23 +317,37 @@ class TonyRecordButton : View {
             }
         }
 
-        override fun onScroll(
-            e1: MotionEvent?,
-            e2: MotionEvent?,
-            distanceX: Float,
-            distanceY: Float
-        ): Boolean {
+        override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
             return true
         }
 
-        override fun onFling(
-            e1: MotionEvent?,
-            e2: MotionEvent?,
-            velocityX: Float,
-            velocityY: Float
-        ): Boolean {
+        override fun onFling(e1: MotionEvent?, e2: MotionEvent?, velocityX: Float, velocityY: Float): Boolean {
             return true
         }
     })
 
+    fun setActionListener(listener : ActionListener){
+        this.listener = listener
+    }
+
+    interface ActionListener {
+        fun onHandsFreeReady(isReady : Boolean){}
+
+        fun onHandsFree(){}
+
+        fun onStartRecord(){}
+
+        fun onFinishRecord(){}
+
+        fun onCapture()
+    }
+
+    companion object{
+        val DEFAULT_SIZE = 300f
+        val DEFAULT_STROKE_WIDTH = 25f
+        val DEFAULT_STROKE_ALPHA = 255
+        val DEFAULT_DURATION = 30000L
+        val DEFAULT_COLOR = Color.WHITE
+        val DEFAULT_RECORD_COLOR = Color.RED
+    }
 }
