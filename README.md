@@ -39,10 +39,11 @@ This is a simple record button you can customize for android application.
 ### 2. In your Activity class:
 ```kotlin
 
+val btn = findViewById<TonyRecordButton>(R.id.btn)
+
 /**
  *  callback for record event
  * */
-val btn = findViewById<TonyRecordButton>(R.id.btn)
 btn.setActionListener(object : TonyRecordButton.ActionListener{
     override fun onCapture() {
         Log.e(TAG, "onCapture")
