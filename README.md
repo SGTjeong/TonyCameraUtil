@@ -36,7 +36,7 @@ This is a simple record button you can customize for android application.
     app:strokeAlpha="128"
     app:recordColor="#ff0000" />
 ```
-### 2. In your activiy class:
+### 2. In your Activity class:
 ```kotlin
 
 /**
