@@ -208,13 +208,14 @@ class TonyRecordButton : View {
     }
 
     private fun drawRecordRect(canvas: Canvas) {
+        Log.e("WONSIK", "drawRecordRect")
         canvas.drawRoundRect(
             (containerSize - rectCurrentSize)/2,
             (containerSize - rectCurrentSize)/2,
             (containerSize + rectCurrentSize)/2,
             (containerSize + rectCurrentSize)/2,
-            10f,
-            10f,
+            5f,
+            5f,
             recordPaint
         )
     }
@@ -270,7 +271,7 @@ class TonyRecordButton : View {
                     buttonScaleValueAnimator.setFloatValues(expandSize, outerSize)
                     buttonScaleValueAnimator.start()
                     isHandsFree = true
-                    listener?.onHandsFree()
+                    applyHandsFree()
                 } else if(!isMatchingCondition(event) && isHandsFree){
                     buttonScaleValueAnimator.setFloatValues(outerSize, expandSize)
                     buttonScaleValueAnimator.start()
@@ -292,6 +293,12 @@ class TonyRecordButton : View {
         }
 
         return true
+    }
+
+    private fun applyHandsFree() {
+        rectScaleValueAnimator.setFloatValues(0f, rectSize)
+        rectScaleValueAnimator.start()
+        listener?.onHandsFree()
     }
 
     fun setHandsFree(isHandsFree : Boolean){
