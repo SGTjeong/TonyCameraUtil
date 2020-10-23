@@ -42,6 +42,7 @@ class TonyRecordButton : View {
     ) : super(context, attrs, defStyleAttr, defStyleRes)
 
     private var listener : ActionListener?= null
+    private var handsFreeDetector : HandsFreeDetector ? = null
 
     private var currentSize = DEFAULT_SIZE
     private var outerSize = DEFAULT_SIZE
@@ -56,8 +57,15 @@ class TonyRecordButton : View {
     private var recordColor : Int = DEFAULT_RECORD_COLOR
     private var strokeAlpha : Int = DEFAULT_STROKE_ALPHA
 
+    private lateinit var centerPaint : Paint
+    private lateinit var strokePaint : Paint
+    private lateinit var strokeRecordPaint : Paint
+    private lateinit var recordPaint : Paint
+    private var outerBorderRect = RectF()
+
     private var duration = DEFAULT_DURATION
     private var isRecording = false
+    private var isHandsFree = false
     private var recordEnabled = true
     private var startRecordTime = System.currentTimeMillis()
 
@@ -68,18 +76,19 @@ class TonyRecordButton : View {
 
     private fun init(context: Context, attrs: AttributeSet) {
         loadAttributes(context, attrs)
+        initPaint()
         initAnimation()
     }
 
     private fun loadAttributes(context: Context, attrs: AttributeSet) {
-        val attrArr = context.obtainStyledAttributes(attrs, R.styleable.tony_record_button, 0, 0)
+        val attrArr = context.obtainStyledAttributes(attrs, R.styleable.TonyRecordButton, 0, 0)
         try{
-            duration = attrArr.getInteger(R.styleable.tony_record_button_maxDuration, DEFAULT_DURATION.toInt()).toLong()
-            strokeWidth = attrArr.getDimensionPixelSize(R.styleable.tony_record_button_strokeWidth, DEFAULT_STROKE_WIDTH.toInt()).toFloat()
-            buttonColor = attrArr.getColor(R.styleable.tony_record_button_buttonColor, DEFAULT_COLOR)
-            strokeColor = attrArr.getColor(R.styleable.tony_record_button_strokeColor, DEFAULT_COLOR)
-            recordColor = attrArr.getColor(R.styleable.tony_record_button_recordColor, DEFAULT_RECORD_COLOR)
-            strokeAlpha = attrArr.getInteger(R.styleable.tony_record_button_strokeAlpha, DEFAULT_STROKE_ALPHA)
+            duration = attrArr.getInteger(R.styleable.TonyRecordButton_maxDuration, DEFAULT_DURATION.toInt()).toLong()
+            strokeWidth = attrArr.getDimensionPixelSize(R.styleable.TonyRecordButton_strokeWidth, DEFAULT_STROKE_WIDTH.toInt()).toFloat()
+            buttonColor = attrArr.getColor(R.styleable.TonyRecordButton_buttonColor, DEFAULT_COLOR)
+            strokeColor = attrArr.getColor(R.styleable.TonyRecordButton_strokeColor, DEFAULT_COLOR)
+            recordColor = attrArr.getColor(R.styleable.TonyRecordButton_recordColor, DEFAULT_RECORD_COLOR)
+            strokeAlpha = attrArr.getInteger(R.styleable.TonyRecordButton_strokeAlpha, DEFAULT_STROKE_ALPHA)
             invalidate()
         } catch (e : Exception){
             Log.e("TonyPhonePicker", e.toString())
@@ -124,6 +133,36 @@ class TonyRecordButton : View {
         }
     }
 
+    private fun initPaint() {
+        centerPaint = Paint().apply {
+            color = buttonColor
+            style = Paint.Style.FILL
+            isAntiAlias = true
+        }
+
+        strokePaint = Paint().apply {
+            color = strokeColor
+            alpha = strokeAlpha
+            style = Paint.Style.STROKE
+            strokeWidth = this@TonyRecordButton.strokeWidth
+            isAntiAlias = true
+        }
+
+        strokeRecordPaint = Paint().apply {
+            color = recordColor
+            style = Paint.Style.STROKE
+            strokeWidth = this@TonyRecordButton.strokeWidth
+            strokeCap = Paint.Cap.ROUND
+            strokeJoin = Paint.Join.ROUND
+            isAntiAlias = true
+        }
+
+        recordPaint = Paint()?.apply {
+            color = recordColor
+            isAntiAlias = true
+        }
+    }
+
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
 
@@ -133,6 +172,7 @@ class TonyRecordButton : View {
         expandSize = outerSize * 1.25f
         currentSize = outerSize
         rectSize = outerSize / 3
+
     }
 
     override fun onDraw(canvas: Canvas?) {
@@ -148,35 +188,15 @@ class TonyRecordButton : View {
     }
 
     private fun drawInnerCircle(canvas: Canvas) {
-        val centerPaint = Paint().apply {
-            color = buttonColor
-            style = Paint.Style.FILL
-            isAntiAlias = true
-        }
         canvas.drawCircle(containerSize/2, containerSize/2, (currentSize-strokeWidth)/2, centerPaint )
     }
 
     private fun drawStroke(canvas: Canvas) {
-        val strokePaint = Paint().apply {
-            color = strokeColor
-            alpha = strokeAlpha
-            style = Paint.Style.STROKE
-            strokeWidth = this@TonyRecordButton.strokeWidth
-            isAntiAlias = true
-        }
         canvas.drawCircle(containerSize/2, containerSize/2, currentSize/2, strokePaint)
     }
 
     private fun drawRecordStroke(canvas: Canvas) {
-        val strokeRecordPaint = Paint().apply {
-            color = recordColor
-            style = Paint.Style.STROKE
-            strokeWidth = this@TonyRecordButton.strokeWidth
-            strokeCap = Paint.Cap.ROUND
-            strokeJoin = Paint.Join.ROUND
-            isAntiAlias = true
-        }
-        val outerBorderRect = RectF().apply {
+        outerBorderRect.apply {
             set(
                 (containerSize - currentSize)/2,
                 (containerSize - currentSize)/2,
@@ -188,10 +208,6 @@ class TonyRecordButton : View {
     }
 
     private fun drawRecordRect(canvas: Canvas) {
-        val recordPaint = Paint()?.apply {
-            color = recordColor
-            isAntiAlias = true
-        }
         canvas.drawRoundRect(
             (containerSize - rectCurrentSize)/2,
             (containerSize - rectCurrentSize)/2,
@@ -226,7 +242,6 @@ class TonyRecordButton : View {
     private fun onRecordEnd() {
         isRecording = false
         isHandsFree = false
-        isReadyForHandsFree = false
         buttonScaleValueAnimator.setFloatValues(expandSize, outerSize)
         buttonScaleValueAnimator.start()
         recordAngleValueAnimator.cancel()
@@ -240,11 +255,29 @@ class TonyRecordButton : View {
         return millisPassed * 360f / duration
     }
 
-    private var isReadyForHandsFree = false
-    private var isHandsFree = false
+    fun setHandsFreeDetector(handsFreeDetector: HandsFreeDetector){
+        this.handsFreeDetector = handsFreeDetector
+    }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
+        event?:return super.onTouchEvent(event)
+
         gestureDetector?.onTouchEvent(event)
+
+        if(isRecording){
+            handsFreeDetector?.apply {
+                if(isMatchingCondition(event) && !isHandsFree){
+                    buttonScaleValueAnimator.setFloatValues(expandSize, outerSize)
+                    buttonScaleValueAnimator.start()
+                    isHandsFree = true
+                    listener?.onHandsFree()
+                } else if(!isMatchingCondition(event) && isHandsFree){
+                    buttonScaleValueAnimator.setFloatValues(outerSize, expandSize)
+                    buttonScaleValueAnimator.start()
+                    isHandsFree = false
+                }
+            }
+        }
 
         if(!isRecording && event?.action == MotionEvent.ACTION_UP){
             buttonScaleValueAnimator?.cancel()
@@ -253,46 +286,20 @@ class TonyRecordButton : View {
         }
 
         if(isRecording && event?.action == MotionEvent.ACTION_UP){
-            if(isReadyForHandsFree){
-                isHandsFree = true
-                rectScaleValueAnimator.setFloatValues(0f, rectSize)
-                rectScaleValueAnimator.start()
-                listener?.onHandsFree()
-            }
-            else {
+            if(!isHandsFree){
                 onRecordEnd()
-            }
-        }
-
-        if(isRecording && event?.action == MotionEvent.ACTION_POINTER_UP){
-            if(isReadyForHandsFree){
-                isHandsFree = true
-            }
-            else {
-                onRecordEnd()
-            }
-        }
-
-        if(event?.action == MotionEvent.ACTION_MOVE){
-            if(event.x < 0){
-                if(isRecording && !isReadyForHandsFree){
-                    isReadyForHandsFree = true
-                    buttonScaleValueAnimator.setFloatValues(expandSize, outerSize)
-                    buttonScaleValueAnimator.start()
-                    listener?.onHandsFreeReady(true)
-                }
-            }
-            else{
-                if(isRecording && isReadyForHandsFree){
-                    isReadyForHandsFree = false
-                    buttonScaleValueAnimator.setFloatValues(outerSize, expandSize)
-                    buttonScaleValueAnimator.start()
-                    listener?.onHandsFreeReady(false)
-                }
             }
         }
 
         return true
+    }
+
+    fun setHandsFree(isHandsFree : Boolean){
+        this.isHandsFree = isHandsFree
+        if(isHandsFree){
+            buttonScaleValueAnimator.setFloatValues(expandSize, outerSize)
+            buttonScaleValueAnimator.start()
+        }
     }
 
     private val gestureDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener(){
@@ -331,8 +338,6 @@ class TonyRecordButton : View {
     }
 
     interface ActionListener {
-        fun onHandsFreeReady(isReady : Boolean){}
-
         fun onHandsFree(){}
 
         fun onStartRecord(){}
