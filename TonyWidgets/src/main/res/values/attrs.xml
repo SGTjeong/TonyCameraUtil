@@ -8,4 +8,8 @@
         <attr name="recordColor" format="color"/>
         <attr name="maxDuration" format="integer"/>
     </declare-styleable>
+
+    <declare-styleable name="TonyRecordLock">
+        <attr format="string" name="record_lock_behavior"/>
+    </declare-styleable>
 </resources>

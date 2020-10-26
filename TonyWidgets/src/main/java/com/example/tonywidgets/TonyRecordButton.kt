@@ -163,7 +163,18 @@ class TonyRecordButton : View {
         }
     }
 
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        Log.e("WONSIK", "onLayout $left $top $right $bottom")
+        super.onLayout(changed, left, top, right, bottom)
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        Log.e("WONSIK", "onMeasure")
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+    }
+
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        Log.e("WONSIK", "onSizeChanged")
         super.onSizeChanged(w, h, oldw, oldh)
 
         val minSide = Math.min(w,h)
@@ -172,10 +183,10 @@ class TonyRecordButton : View {
         expandSize = outerSize * 1.25f
         currentSize = outerSize
         rectSize = outerSize / 3
-
     }
 
     override fun onDraw(canvas: Canvas?) {
+        Log.e("WONSIK", "onDraw")
         super.onDraw(canvas)
         canvas?:return
 

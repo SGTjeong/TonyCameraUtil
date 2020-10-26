@@ -16,8 +16,11 @@ class DemoActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val btn = findViewById<TonyRecordButton>(R.id.btn)
 
+        /**
+         *  callback for record event
+         * */
+        val btn = findViewById<TonyRecordButton>(R.id.btn)
         btn.setActionListener(object : TonyRecordButton.ActionListener{
             override fun onCapture() {
                 Log.e(TAG, "onCapture")
@@ -36,6 +39,9 @@ class DemoActivity : AppCompatActivity() {
             }
         })
 
+        /**
+         *  set hands-free condition
+         * */
         btn.setHandsFreeDetector(object : HandsFreeDetector() {
             override fun isMatchingCondition(event: MotionEvent): Boolean {
                 return (event.x < 0 && event.actionMasked == MotionEvent.ACTION_UP)
