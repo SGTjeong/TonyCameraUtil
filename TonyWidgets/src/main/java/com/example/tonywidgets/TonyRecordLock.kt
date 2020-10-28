@@ -25,7 +25,7 @@ class TonyRecordLock : View {
     private fun loadAttributes(context: Context, attrs: AttributeSet) {
         val attrArr = context.obtainStyledAttributes(attrs, R.styleable.TonyRecordLock, 0, 0)
         try{
-            layoutBehavior = attrArr.getString(R.styleable.TonyRecordLock_layout_behavior)?:""
+            //layoutBehavior = attrArr.getString(R.styleable.TonyRecordLock_layout_behavior)?:""
         } catch (e : Exception){
             Log.e("TonyPhonePicker", e.toString())
         } finally {
