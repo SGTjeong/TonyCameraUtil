@@ -9,8 +9,12 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 
-class PointerView : View {
+class TonyRippleCanvas : View {
+    private val TAG = this.javaClass.simpleName
     private var list : MutableList<Pair<Float,Float>>? = null
+
+    private var rippleColor = TonyRippleConstraintLayout.DEFAULT_COLOR
+    private var rippleRadius = TonyRippleConstraintLayout.DEFAULT_RADIUS
 
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
@@ -20,10 +24,12 @@ class PointerView : View {
         defStyleAttr
     )
 
-    override fun onTouchEvent(event: MotionEvent?): Boolean {
-        Log.e("WONSIK", "onTouchEvent in PointerView")
-        event?: return super.onTouchEvent(event)
-        return false
+    fun setColor(color : Int){
+        this.rippleColor = color
+    }
+
+    fun setRadius(radius : Int){
+        this.rippleRadius = radius
     }
 
     fun drawPointers(event : MotionEvent?){
@@ -52,12 +58,12 @@ class PointerView : View {
     }
 
     private fun removeLastCircle(event: MotionEvent) {
+        list = mutableListOf()
         invalidate()
     }
 
 
     private fun drawCircle(event : MotionEvent) {
-        Log.e("WONSIK", "drawCircle")
         list = mutableListOf()
         for(i in 0 until event.pointerCount){
             val x = event.getX(i)
@@ -68,19 +74,17 @@ class PointerView : View {
     }
 
     override fun onDraw(canvas: Canvas?) {
-        Log.e("WONSIK", "onDraw")
         super.onDraw(canvas)
-        list?.let {
-            val itr = it.iterator()
-            var pair: Pair<Float, Float>? = null
-            while (itr.hasNext()) {
-                pair = itr.next()
-                canvas?.drawCircle(
-                    pair.first,
-                    pair.second,
-                    40f,
-                    Paint().apply { color = Color.BLACK })
-            }
+        if(canvas == null || list == null) return
+
+        val itr = list!!.iterator()
+        var pair: Pair<Float, Float>?
+
+        while (itr.hasNext()) {
+            pair = itr.next()
+            canvas?.drawCircle(
+                pair.first, pair.second, rippleRadius.toFloat(), Paint().apply { color = rippleColor}
+            )
         }
     }
 }

@@ -12,4 +12,9 @@
     <declare-styleable name="TonyRecordLock">
         <attr format="string" name="record_lock_behavior"/>
     </declare-styleable>
+
+    <declare-styleable name="TonyRippleConstraintLayout">
+        <attr name="rippleColor" format="color"/>
+        <attr name="rippleRadius" format="dimension"/>
+    </declare-styleable>
 </resources>

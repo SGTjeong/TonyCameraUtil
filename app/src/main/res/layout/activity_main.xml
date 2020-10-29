@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.example.tonywidgets.TonyRippleLayout
+<com.example.tonywidgets.TonyRippleConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    app:rippleColor="#fff"
+    app:rippleRadius="20dp"
     tools:context=".DemoActivity">
 
-    <!--
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:src="@drawable/beach">
+        android:src="@drawable/beach"
+        android:scaleType="centerCrop">
     </ImageView>
-    -->
 
     <com.example.tonywidgets.TonyRecordButton
         android:id="@+id/btn"
         android:layout_width="70dp"
         android:layout_height="70dp"
         app:maxDuration="5000"
-        app:buttonColor="#ffffff"
+        app:buttonColor="#fff"
         app:strokeColor="#ffffff"
         app:strokeWidth="5dp"
         app:strokeAlpha="128"
@@ -32,4 +32,4 @@
         android:layout_marginBottom="50dp">
     </com.example.tonywidgets.TonyRecordButton>
 
-</com.example.tonywidgets.TonyRippleLayout>
+</com.example.tonywidgets.TonyRippleConstraintLayout>
