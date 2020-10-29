@@ -7,10 +7,11 @@ import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import com.example.tonywidgets.HandsFreeDetector
+import com.example.tonywidgets.TonyRecordActionListener
 import com.example.tonywidgets.TonyRecordButton
 
 
-class DemoActivity : AppCompatActivity() {
+class SimpleActivity : AppCompatActivity() {
     private val TAG = this.javaClass.simpleName
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,7 +22,7 @@ class DemoActivity : AppCompatActivity() {
          *  callback for record event
          * */
         val btn = findViewById<TonyRecordButton>(R.id.btn)
-        btn.setActionListener(object : TonyRecordButton.ActionListener{
+        btn.setActionListener(object : TonyRecordActionListener {
             override fun onCapture() {
                 Log.e(TAG, "onCapture")
             }
@@ -39,14 +40,6 @@ class DemoActivity : AppCompatActivity() {
             }
         })
 
-        /**
-         *  set hands-free condition
-         * */
-        btn.setHandsFreeDetector(object : HandsFreeDetector() {
-            override fun isMatchingCondition(event: MotionEvent): Boolean {
-                return (event.x < 0 && event.actionMasked == MotionEvent.ACTION_UP)
-            }
-        })
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {

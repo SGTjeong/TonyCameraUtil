@@ -2,9 +2,10 @@ package com.example.tonywidgets
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 
-class TonyCameraLayout : ConstraintLayout{
+class TonyRecordConstraintLayout : TonyRippleConstraintLayout {
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
@@ -13,12 +14,11 @@ class TonyCameraLayout : ConstraintLayout{
         defStyleAttr
     )
 
-
     override fun onFinishInflate() {
         super.onFinishInflate()
 
-        var recordLock : TonyRecordLock? = null
         var recordButton : TonyRecordButton? = null
+        var recordLock : TonyRecordLock? = null
 
         for(i in 0 until childCount){
             val view = getChildAt(i)
@@ -31,6 +31,10 @@ class TonyCameraLayout : ConstraintLayout{
             }
         }
 
+        if(recordButton!=null && recordLock!=null){
+            recordButton.attachLockView(recordLock)
+            recordLock.visibility = View.GONE
+        }
 
     }
 }

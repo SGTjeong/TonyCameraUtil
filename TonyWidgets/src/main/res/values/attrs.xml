@@ -10,10 +10,13 @@
     </declare-styleable>
 
     <declare-styleable name="TonyRecordLock">
-        <attr format="string" name="record_lock_behavior"/>
+        <attr name="record_lock_behavior" format="string"/>
+        <attr name="drawableNotReady" format="reference"/>
+        <attr name="drawableReady" format="reference"/>
     </declare-styleable>
 
     <declare-styleable name="TonyRippleConstraintLayout">
+        <attr name="willDraw" format="boolean"/>
         <attr name="rippleColor" format="color"/>
         <attr name="rippleRadius" format="dimension"/>
     </declare-styleable>

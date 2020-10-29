@@ -25,23 +25,12 @@ class TonyRecordButton : View {
         init(context, attrs)
     }
 
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(
-        context,
-        attrs,
-        defStyleAttr
-    ){
+    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr){
         if(context == null || attrs == null) return
         init(context, attrs)
     }
 
-    constructor(
-        context: Context?,
-        attrs: AttributeSet?,
-        defStyleAttr: Int,
-        defStyleRes: Int
-    ) : super(context, attrs, defStyleAttr, defStyleRes)
-
-    private var listener : ActionListener?= null
+    private var listener : TonyRecordActionListener?= null
     private var handsFreeDetector : HandsFreeDetector ? = null
 
     private var currentSize = DEFAULT_SIZE
@@ -163,18 +152,7 @@ class TonyRecordButton : View {
         }
     }
 
-    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
-        //Log.e("WONSIK", "onLayout $left $top $right $bottom")
-        super.onLayout(changed, left, top, right, bottom)
-    }
-
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        //Log.e("WONSIK", "onMeasure")
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-    }
-
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        //Log.e("WONSIK", "onSizeChanged")
         super.onSizeChanged(w, h, oldw, oldh)
 
         val minSide = Math.min(w,h)
@@ -186,7 +164,6 @@ class TonyRecordButton : View {
     }
 
     override fun onDraw(canvas: Canvas?) {
-        //Log.e("WONSIK", "onDraw")
         super.onDraw(canvas)
         canvas?:return
 
@@ -219,7 +196,6 @@ class TonyRecordButton : View {
     }
 
     private fun drawRecordRect(canvas: Canvas) {
-        //Log.e("WONSIK", "drawRecordRect")
         canvas.drawRoundRect(
             (containerSize - rectCurrentSize)/2,
             (containerSize - rectCurrentSize)/2,
@@ -249,6 +225,7 @@ class TonyRecordButton : View {
         startRecordTime = System.currentTimeMillis()
         recordAngleValueAnimator.start()
         listener?.onStartRecord()
+        attachedLock?.onStartRecord()
     }
 
     private fun onRecordEnd() {
@@ -260,6 +237,7 @@ class TonyRecordButton : View {
         rectCurrentSize = 0f
         invalidate()
         listener?.onFinishRecord()
+        attachedLock?.onFinishRecord()
     }
 
     private fun calculateCurrentAngle() : Float {
@@ -275,14 +253,21 @@ class TonyRecordButton : View {
         event?:return super.onTouchEvent(event)
 
         gestureDetector?.onTouchEvent(event)
-
         if(isRecording){
             handsFreeDetector?.apply {
+                if(!isHandsFree){
+                    if(isMatchingReadyCondition(event)){
+                        attachedLock?.onHandsFreeReady()
+                    } else{
+                        attachedLock?.onHandsFreeNotReady()
+                    }
+                }
+
                 if(isMatchingCondition(event) && !isHandsFree){
                     buttonScaleValueAnimator.setFloatValues(expandSize, outerSize)
                     buttonScaleValueAnimator.start()
                     isHandsFree = true
-                    applyHandsFree()
+                    applyHandsFreeOn()
                 } else if(!isMatchingCondition(event) && isHandsFree){
                     buttonScaleValueAnimator.setFloatValues(outerSize, expandSize)
                     buttonScaleValueAnimator.start()
@@ -306,10 +291,11 @@ class TonyRecordButton : View {
         return true
     }
 
-    private fun applyHandsFree() {
+    private fun applyHandsFreeOn() {
         rectScaleValueAnimator.setFloatValues(0f, rectSize)
         rectScaleValueAnimator.start()
         listener?.onHandsFree()
+        attachedLock?.onHandsFree()
     }
 
     fun setHandsFree(isHandsFree : Boolean){
@@ -351,18 +337,14 @@ class TonyRecordButton : View {
         }
     })
 
-    fun setActionListener(listener : ActionListener){
+    fun setActionListener(listener : TonyRecordActionListener){
         this.listener = listener
     }
 
-    interface ActionListener {
-        fun onHandsFree(){}
+    private var attachedLock : TonyRecordLock? = null
 
-        fun onStartRecord(){}
-
-        fun onFinishRecord(){}
-
-        fun onCapture()
+    fun attachLockView(attachedLock: TonyRecordLock) {
+        this.attachedLock = attachedLock
     }
 
     companion object{

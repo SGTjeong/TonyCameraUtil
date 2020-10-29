@@ -1,20 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.example.tonywidgets.TonyRippleConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.example.tonywidgets.TonyRecordConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/beach"
     app:rippleColor="#fff"
-    app:rippleRadius="20dp"
-    tools:context=".SimpleActivity">
-
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:src="@drawable/beach"
-        android:scaleType="centerCrop">
-    </ImageView>
+    app:rippleRadius="10dp"
+    app:willDraw="true"
+    tools:context=".HandsFreeActivity">
 
     <com.example.tonywidgets.TonyRecordButton
         android:id="@+id/btn"
@@ -32,4 +26,17 @@
         android:layout_marginBottom="50dp">
     </com.example.tonywidgets.TonyRecordButton>
 
-</com.example.tonywidgets.TonyRippleConstraintLayout>
+    <com.example.tonywidgets.TonyRecordLock
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        app:record_lock_behavior="@string/record_lock_behavior"
+        app:drawableNotReady="@drawable/lock_off"
+        app:drawableReady="@drawable/lock_on"
+        app:layout_constraintTop_toTopOf="@id/btn"
+        app:layout_constraintBottom_toBottomOf="@id/btn"
+        app:layout_constraintRight_toLeftOf="@id/btn"
+        android:layout_marginRight="10dp">
+    </com.example.tonywidgets.TonyRecordLock>
+
+
+</com.example.tonywidgets.TonyRecordConstraintLayout>

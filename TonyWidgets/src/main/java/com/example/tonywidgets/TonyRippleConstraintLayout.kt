@@ -8,7 +8,7 @@ import android.view.MotionEvent
 import androidx.constraintlayout.widget.ConstraintLayout
 import java.lang.Exception
 
-class TonyRippleConstraintLayout : ConstraintLayout {
+open class TonyRippleConstraintLayout : ConstraintLayout {
     private val TAG = this.javaClass.simpleName
 
     constructor(context: Context) : super(context)
@@ -24,6 +24,7 @@ class TonyRippleConstraintLayout : ConstraintLayout {
     }
 
     private lateinit var tonyRippleCanvas : TonyRippleCanvas
+    private var willDraw : Boolean = false
     private var rippleColor : Int = DEFAULT_COLOR
     private var rippleRadius : Int = DEFAULT_RADIUS
 
@@ -35,6 +36,7 @@ class TonyRippleConstraintLayout : ConstraintLayout {
     private fun loadAttributes(context: Context, attrs: AttributeSet?) {
         val attrArr = context.obtainStyledAttributes(attrs, R.styleable.TonyRippleConstraintLayout, 0, 0)
         try{
+            willDraw = attrArr.getBoolean(R.styleable.TonyRippleConstraintLayout_willDraw, false)
             rippleColor = attrArr.getColor(R.styleable.TonyRippleConstraintLayout_rippleColor, TonyRippleConstraintLayout.DEFAULT_COLOR)
             rippleRadius = attrArr.getDimensionPixelSize(R.styleable.TonyRippleConstraintLayout_rippleRadius, DEFAULT_RADIUS)
         } catch (e : Exception){
@@ -63,7 +65,9 @@ class TonyRippleConstraintLayout : ConstraintLayout {
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
-        tonyRippleCanvas.drawPointers(ev)
+        if(willDraw) {
+            tonyRippleCanvas.drawPointers(ev)
+        }
         return super.dispatchTouchEvent(ev)
     }
 
