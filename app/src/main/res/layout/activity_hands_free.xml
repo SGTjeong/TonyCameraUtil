@@ -5,9 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/beach"
-    app:rippleColor="#fff"
-    app:rippleRadius="10dp"
-    app:willDraw="true"
     tools:context=".HandsFreeActivity">
 
     <com.example.tonywidgets.TonyRecordButton

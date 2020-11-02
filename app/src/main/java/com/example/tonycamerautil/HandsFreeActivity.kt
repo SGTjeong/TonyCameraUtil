@@ -1,5 +1,6 @@
 package com.example.tonycamerautil
 
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -14,6 +15,7 @@ class HandsFreeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_hands_free)
+
 
         val btn = findViewById<TonyRecordButton>(R.id.btn)
         btn.setActionListener(object : TonyRecordActionListener {
@@ -47,4 +49,6 @@ class HandsFreeActivity : AppCompatActivity() {
             }
         })
     }
+
 }
+

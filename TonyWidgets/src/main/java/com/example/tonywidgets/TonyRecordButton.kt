@@ -355,4 +355,5 @@ class TonyRecordButton : View {
         val DEFAULT_COLOR = Color.WHITE
         val DEFAULT_RECORD_COLOR = Color.RED
     }
+
 }

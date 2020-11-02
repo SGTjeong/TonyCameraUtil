@@ -2,11 +2,9 @@ package com.example.tonycamerautil
 
 import android.os.Bundle
 import android.util.Log
-import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
-import com.example.tonywidgets.HandsFreeDetector
 import com.example.tonywidgets.TonyRecordActionListener
 import com.example.tonywidgets.TonyRecordButton
 
