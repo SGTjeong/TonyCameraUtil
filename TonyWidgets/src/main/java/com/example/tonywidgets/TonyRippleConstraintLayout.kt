@@ -61,15 +61,13 @@ open class TonyRippleConstraintLayout : ConstraintLayout {
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
+        if(willDraw) {
+            tonyRippleCanvas.drawPointers(event)
+        }
         return true
     }
 
-    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
-        if(willDraw) {
-            tonyRippleCanvas.drawPointers(ev)
-        }
-        return super.dispatchTouchEvent(ev)
-    }
+
 
     companion object{
         val DEFAULT_COLOR = Color.WHITE

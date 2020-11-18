@@ -64,6 +64,7 @@ class TonyRippleCanvas : View {
 
 
     private fun drawCircle(event : MotionEvent) {
+        Log.e("WONSIK", "drawCircle")
         list = mutableListOf()
         for(i in 0 until event.pointerCount){
             val x = event.getX(i)

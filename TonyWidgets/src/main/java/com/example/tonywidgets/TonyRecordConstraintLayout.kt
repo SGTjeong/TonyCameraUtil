@@ -3,9 +3,8 @@ package com.example.tonywidgets
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
-import androidx.constraintlayout.widget.ConstraintLayout
 
-class TonyRecordConstraintLayout : ConstraintLayout {
+class TonyRecordConstraintLayout : TonyRippleConstraintLayout {
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
