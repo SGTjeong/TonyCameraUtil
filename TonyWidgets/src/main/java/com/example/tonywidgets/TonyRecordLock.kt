@@ -10,6 +10,8 @@ import java.lang.Exception
 
 class TonyRecordLock : androidx.appcompat.widget.AppCompatImageView, TonyHandsFreeListener{
     private lateinit var layoutBehavior : String
+    private var isOn = false
+    private var listener : HandsFreeReadyListener? = null
     private lateinit var drawableOff : Drawable
     private lateinit var drawableOn : Drawable
 
@@ -55,15 +57,36 @@ class TonyRecordLock : androidx.appcompat.widget.AppCompatImageView, TonyHandsFr
     override fun onHandsFreeReady() {
         if (!isAttachedToWindow) return
         background = drawableOn
+        if(!isOn){
+            listener?.onHandsFreeReady()
+        }
+        isOn = true
     }
 
     override fun onHandsFreeNotReady() {
         if(!isAttachedToWindow) return
         background = drawableOff
+        if(isOn){
+            listener?.onHandsFreeNotReady()
+        }
+        isOn = false
     }
 
     override fun onHandsFree() {
         if(!isAttachedToWindow) return
         visibility = View.GONE
+    }
+
+    fun setHandsFreeReadyListener(listener : HandsFreeReadyListener){
+        this.listener = listener
+
+    }
+    interface HandsFreeReadyListener{
+        fun onHandsFreeReady(){
+
+        }
+        fun onHandsFreeNotReady(){
+
+        }
     }
 }

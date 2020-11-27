@@ -24,7 +24,7 @@ open class TonyRippleConstraintLayout : ConstraintLayout {
     }
 
     private lateinit var tonyRippleCanvas : TonyRippleCanvas
-    private var willDraw : Boolean = false
+    private var willDraw : Boolean = true
     private var rippleColor : Int = DEFAULT_COLOR
     private var rippleRadius : Int = DEFAULT_RADIUS
 
@@ -61,13 +61,17 @@ open class TonyRippleConstraintLayout : ConstraintLayout {
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        if(willDraw) {
-            tonyRippleCanvas.drawPointers(event)
-        }
-        return true
+        Log.e("WONSIK", "onTouchEvent")
+        return super.onTouchEvent(event)
     }
 
-
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        Log.e("WONSIK", "dispatchTouchEvent")
+        if(willDraw) {
+            tonyRippleCanvas.drawPointers(ev)
+        }
+        return super.dispatchTouchEvent(ev)
+    }
 
     companion object{
         val DEFAULT_COLOR = Color.WHITE
